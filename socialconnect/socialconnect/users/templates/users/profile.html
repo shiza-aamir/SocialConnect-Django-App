@@ -1,0 +1,90 @@
+<!-- users/templates/users/profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-container" style="max-width: 800px; margin: 0 auto;">
+    <div class="profile-header" style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <img src="{{ profile_user.profile.profile_picture.url }}" 
+                 alt="{{ profile_user.username }}" 
+                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+            
+            <div style="flex: 1;">
+                <h1 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ profile_user.username }}</h1>
+                
+                {% if profile_user.profile.bio %}
+                    <p style="margin-bottom: 0.5rem; font-size: 1.1rem; color: #34495e;">{{ profile_user.profile.bio }}</p>
+                {% endif %}
+                
+                {% if profile_user.profile.location %}
+                    <p style="margin-bottom: 1rem; color: #7f8c8d;">📍 {{ profile_user.profile.location }}</p>
+                {% endif %}
+                
+                <div class="profile-stats" style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                    <div style="text-align: center;">
+                        <strong style="display: block; font-size: 1.2rem; color: #2c3e50;">{{ posts.count }}</strong>
+                        <span style="color: #7f8c8d;">Posts</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <strong style="display: block; font-size: 1.2rem; color: #2c3e50;">0</strong>
+                        <span style="color: #7f8c8d;">Followers</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <strong style="display: block; font-size: 1.2rem; color: #2c3e50;">0</strong>
+                        <span style="color: #7f8c8d;">Following</span>
+                    </div>
+                </div>
+                
+                {% if user == profile_user %}
+                    <a href="{% url 'edit_profile' %}" class="btn" style="background: #3498db; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; display: inline-block;">
+                        Edit Profile
+                    </a>
+                {% else %}
+                    <button class="btn" style="background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">
+                        Follow
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="user-posts">
+        <h2 style="margin-bottom: 1rem; color: #2c3e50;">Posts</h2>
+        
+        {% if posts %}
+            <div class="posts-grid">
+                {% for post in posts %}
+                <div class="post-preview" style="background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                    <a href="{% url 'post_detail' post.id %}" style="text-decoration: none; color: inherit;">
+                        <p style="margin-bottom: 1rem; color: #2c3e50;">{{ post.content|truncatewords:30 }}</p>
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="Post image" style="max-width: 100%; border-radius: 5px;">
+                        {% endif %}
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem; color: #7f8c8d; font-size: 0.9rem;">
+                            <span>❤️ {{ post.likes.count }} likes</span>
+                            <span>💬 {{ post.comments.count }} comments</span>
+                            <span>{{ post.created_at|timesince }} ago</span>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="color: #7f8c8d; font-size: 1.1rem; margin-bottom: 1rem;">
+                    {% if user == profile_user %}
+                        You haven't created any posts yet.
+                    {% else %}
+                        {{ profile_user.username }} hasn't created any posts yet.
+                    {% endif %}
+                </p>
+                {% if user == profile_user %}
+                    <a href="{% url 'create_post' %}" class="btn" style="background: #27ae60; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 5px; display: inline-block;">
+                        Create Your First Post
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
