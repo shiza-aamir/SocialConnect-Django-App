@@ -1,0 +1,47 @@
+<!-- users/templates/users/profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile">
+    <div class="profile-header">
+        <img src="{{ profile_user.profile.profile_picture.url }}" alt="{{ profile_user.username }}">
+        <div class="profile-info">
+            <h1>{{ profile_user.username }}</h1>
+            <p class="bio">{{ profile_user.profile.bio }}</p>
+            <p class="location">{{ profile_user.profile.location }}</p>
+            
+            <div class="profile-stats">
+                <span>{{ posts.count }} Posts</span>
+                <span>{{ profile_user.followers.count }} Followers</span>
+                <span>{{ profile_user.following.count }} Following</span>
+            </div>
+
+            {% if user != profile_user %}
+                <a href="{% url 'toggle_follow' profile_user.username %}" class="btn">
+                    {% if is_following %}Unfollow{% else %}Follow{% endif %}
+                </a>
+            {% else %}
+                <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="user-posts">
+        <h2>Posts</h2>
+        <div class="posts-grid">
+            {% for post in posts %}
+            <div class="post-preview">
+                <a href="{% url 'post_detail' post.id %}">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Post image">
+                    {% endif %}
+                    <p>{{ post.content|truncatewords:20 }}</p>
+                </a>
+            </div>
+            {% empty %}
+            <p>No posts yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

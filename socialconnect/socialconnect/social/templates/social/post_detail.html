@@ -1,0 +1,95 @@
+<!-- social/templates/social/post_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <!-- Post -->
+    <div class="post-card" style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div class="post-header" style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <img src="{{ post.author.profile.profile_picture.url }}" alt="{{ post.author.username }}" 
+                 style="width: 50px; height: 50px; border-radius: 50%; margin-right: 1rem;">
+            <div>
+                <h3 style="margin: 0;">
+                    <a href="{% url 'profile' post.author.username %}" style="text-decoration: none; color: #2c3e50;">
+                        {{ post.author.username }}
+                    </a>
+                </h3>
+                <small style="color: #7f8c8d;">{{ post.created_at|timesince }} ago</small>
+            </div>
+        </div>
+        
+        <div class="post-content">
+            <p style="margin-bottom: 1rem; font-size: 1.1rem; line-height: 1.5;">{{ post.content }}</p>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Post image" style="max-width: 100%; border-radius: 5px; margin-bottom: 1rem;">
+            {% endif %}
+        </div>
+
+        <div class="post-actions" style="display: flex; gap: 2rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+            <a href="{% url 'toggle_like' post.id %}" class="btn" style="background: #e74c3c; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px;">
+                ❤️ {{ post.likes.count }} Likes
+            </a>
+            <span style="color: #7f8c8d; padding: 0.5rem 1rem;">
+                💬 {{ post.comments.count }} Comments
+            </span>
+        </div>
+    </div>
+
+    <!-- Add Comment Form -->
+    <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #2c3e50;">Add a Comment</h3>
+        <form method="post" action="{% url 'add_comment' post.id %}">
+            {% csrf_token %}
+            <textarea name="content" rows="3" 
+                      style="width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 1rem;"
+                      placeholder="Write your comment..." required></textarea>
+            <button type="submit" style="padding: 0.75rem 1.5rem; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Post Comment
+            </button>
+        </form>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h3 style="margin-bottom: 1rem; color: #2c3e50;">Comments ({{ post.comments.count }})</h3>
+        
+        {% if post.comments.all %}
+            {% for comment in post.comments.all %}
+            <div class="comment" style="background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                    <img src="{{ comment.author.profile.profile_picture.url }}" alt="{{ comment.author.username }}" 
+                         style="width: 35px; height: 35px; border-radius: 50%; margin-right: 0.75rem;">
+                    <div>
+                        <strong style="color: #2c3e50;">
+                            <a href="{% url 'profile' comment.author.username %}" style="text-decoration: none; color: inherit;">
+                                {{ comment.author.username }}
+                            </a>
+                        </strong>
+                        <small style="color: #7f8c8d; margin-left: 0.5rem;">{{ comment.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+                <p style="margin: 0; color: #34495e;">{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <p style="color: #7f8c8d;">No comments yet. Be the first to comment!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    textarea {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    textarea:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+</style>
+{% endblock %}
